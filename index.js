@@ -15,6 +15,9 @@ app.use(express.urlencoded({extended:true}))
 
 app.get('/:id',async(req,res)=>{
     const url=await urlModel.findById(req.params.id);
+    if(!url){
+        return res.status(200).json({message:'This url is not registered to redirect to any url'});
+    }
     return res.redirect(url.originalUrl);
 });
 app.post('/',async(req,res)=>{
