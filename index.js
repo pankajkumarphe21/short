@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from "dotenv";
 import connect from "./db/connect.js";
 import urlModel from './models/url.js'
+import mongoose from "mongoose";
 
 dotenv.config();
 connect();
@@ -14,6 +15,9 @@ app.use(express.json());
 app.use(express.urlencoded({extended:true}))
 
 app.get('/:id',async(req,res)=>{
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+        return res.status(200).json({message:'This url is not registered to redirect to any url'});
+    }
     const url=await urlModel.findById(req.params.id);
     if(!url){
         return res.status(200).json({message:'This url is not registered to redirect to any url'});
@@ -25,6 +29,11 @@ app.post('/',async(req,res)=>{
     url.passiveUrl=process.env.BASE_URL+url._id
     await url.save();
     return res.status(200).json({url:url.passiveUrl});
+})
+app.get('/',(req,res)=>{
+    return res.status(200).json(
+        {message:'This url is not registered to redirect to any url'}
+    );
 })
 
 app.listen(process.env.PORT);
